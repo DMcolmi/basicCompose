@@ -3,10 +3,16 @@ package com.teddydev.basicscodelab
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,7 +35,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MyApp(){
 
-    var shouldShowOnboarding by remember { mutableStateOf(true) }
+    var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
 
     if(shouldShowOnboarding){
         OnboardingScreen(onContinueClicked = {shouldShowOnboarding = false})
@@ -39,18 +45,20 @@ private fun MyApp(){
 }
 
 @Composable
-fun Greetings(names: List<String> = listOf("World", "Compose")) {
-    Column(modifier = Modifier.padding(vertical = 4.dp)) {
-        for (name in names) {
-            Greeting(name = name)
+fun Greetings(names: List<String> = List(1000) {"record no. $it"}) {
+    LazyColumn(Modifier.padding(4.dp)){
+        items(names) { record ->
+            Greeting(name = record)
         }
     }
 }
 
 @Composable
 private fun Greeting(name: String) {
-    val expanded = remember { mutableStateOf(false) }
-    val extraPadding = if(expanded.value) 48.dp else 0.dp
+    var expanded by remember { mutableStateOf(false) }
+    val extraPaddingAnimate by animateDpAsState(targetValue = if(expanded) 48.dp else 0.dp
+    , animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow))
+
 
     Surface(
         color = MaterialTheme.colors.primary,
@@ -62,14 +70,14 @@ private fun Greeting(name: String) {
             .padding(24.dp)) {
             Column(modifier = Modifier
                 .weight(1f)
-                .padding(bottom = extraPadding)) {
+                .padding(bottom = extraPaddingAnimate.coerceAtLeast(0.dp))) {
                 Text(text = "Hello, ")
                 Text(text = name)
             }
-            OutlinedButton(onClick = { expanded.value = !expanded.value},
+            OutlinedButton(onClick = { expanded = !expanded},
 
             ) {
-                Text(text = if(expanded.value) "Show less" else "Show more")
+                Text(text = if(expanded) "Show less" else "Show more")
             }
         }
     }
