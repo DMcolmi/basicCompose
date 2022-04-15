@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Basics Codelab</string>
+    <string name="show_less">Show Less</string>
+    <string name="show_more">Show More</string>
+    <string name="text_in_greeting">Remove the extraPadding and instead apply the animateContentSize modifier to the Row. This is going to automate the process of creating the animation, which would be hard to do manually. Also, it removes the need to coerceAtLeast</string>
 </resources>
